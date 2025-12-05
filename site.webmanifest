@@ -1,0 +1,22 @@
+{
+    "name": "Audio Lab: Pro Sound Editor",
+    "short_name": "Audio Lab",
+    "description": "Professional-grade speed, pitch, EQ, and FX audio manipulation, all in your browser.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#1f2937",
+    "theme_color": "#0f172a",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

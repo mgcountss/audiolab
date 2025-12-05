@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Audio Lab: Pro Sound Editor - Online Speed, Pitch, & FX Manipulation</title>
+    <meta name="description" content="Audio Lab is a professional-grade online sound editor for speed, pitch shifting, volume, pan, EQ (Bass/Treble), Reverb, Echo, Distortion, and fading. Upload and edit MP3, WAV, or OGG files instantly in your browser.">
+    <meta name="keywords" content="audio editor, online audio editor, sound editor, free audio editor, speed changer, pitch shifter, audio effects, EQ, reverb, echo, distortion, volume control, audio lab, audiolab.mgcounts.com">
+    <meta name="author" content="@ok_aj">
+    <link rel="canonical" href="https://audiolab.mgcounts.com/">
+
+    <meta property="og:title" content="Audio Lab: Pro Sound Editor - Online Speed, Pitch, & FX Manipulation">
+    <meta property="og:description" content="Professional-grade speed, pitch, EQ, and FX audio manipulation, all in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://audiolab.mgcounts.com/">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://audiolab.mgcounts.com/audio-lab-preview.jpg">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ok_aj">
+    <meta name="twitter:creator" content="@ok_aj">
+
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Reset and Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Modern, deep-sky gradient */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #e2e8f0;
+        }
+
+        /* Main Container Styling */
+        .container {
+            background: #1f2937;
+            /* Darker, professional background */
+            border-radius: 12px;
+            padding: 40px;
+            /* Subtle depth effect */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            max-width: 800px;
+            /* Increased max-width for more controls */
+            width: 100%;
+        }
+
+        /* Typography and Header */
+        h1 {
+            text-align: center;
+            color: #93c5fd;
+            /* Light blue accent */
+            margin-bottom: 5px;
+            font-size: 36px;
+            font-weight: 900;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            border: 2px dashed #374151;
+            /* Subtle dashed border */
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #2d3748;
+        }
+
+        .upload-section:hover {
+            background: #3c4a5c;
+            border-color: #60a5fa;
+            /* Blue accent on hover */
+        }
+
+        .upload-section.dragover {
+            background: #4a5568;
+            border-color: #3b82f6;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #60a5fa;
+        }
+
+        .upload-section p {
+            color: #d1d5db;
+        }
+
+        .upload-section strong {
+            font-weight: 700;
+            color: #e5e7eb;
+        }
+
+        /* Controls Section */
+        .controls {
+            display: none;
+        }
+
+        .controls.active {
+            display: block;
+        }
+
+        .filename {
+            text-align: center;
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding: 12px;
+            background: #253343;
+            border-radius: 6px;
+            border-left: 4px solid #60a5fa;
+            font-size: 16px;
+        }
+
+        /* Waveform Display */
+        .waveform {
+            height: 100px;
+            background: #111827;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid #374151;
+        }
+
+        .progress-bar {
+            height: 100%;
+            /* Subtle highlight for played portion */
+            background: rgba(96, 165, 250, 0.15);
+            width: 0%;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .playhead {
+            position: absolute;
+            width: 2px;
+            /* Thinner playhead */
+            height: 100%;
+            background: #ef4444;
+            /* Distinctive red color */
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+        }
+
+        .time-display {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            font-size: 12px;
+            color: #f3f4f6;
+            background: rgba(17, 24, 39, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+            font-weight: 600;
+        }
+
+        .waveform-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Control Groups and Sliders */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* Two columns for controls */
+            gap: 20px 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            margin-bottom: 0;
+            /* Handled by grid gap */
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .value-display {
+            color: #60a5fa;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            /* Thinner track */
+            border-radius: 3px;
+            background: #374151;
+            /* Dark track color */
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* Slider Thumb Styling */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #60a5fa;
+            /* Blue thumb */
+            cursor: pointer;
+            border: 3px solid #1f2937;
+            /* Border matching container */
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #3b82f6;
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+            border: 3px solid #1f2937;
+        }
+
+        /* Button Groups */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .play-btn {
+            background: #22c55e;
+            /* Green for play/action */
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .reset-btn {
+            background: #4b5563;
+            /* Subtle gray for secondary actions */
+            color: #f3f4f6;
+        }
+
+        .reset-btn:hover {
+            background: #374151;
+            box-shadow: none;
+        }
+
+        .download-btn {
+            background: #3b82f6;
+            /* Blue for download */
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .action-button-group {
+            grid-column: 1 / -1;
+            /* Full width for the main buttons */
+            margin-top: 15px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 650px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><span style="color: #60a5fa;">AUDIO</span> LAB 🎧</h1>
+        <p class="subtitle">Professional-grade speed, pitch, EQ, and FX audio manipulation.</p>
+
+        <div class="upload-section" id="uploadSection">
+            <div class="upload-icon">⬆️</div>
+            <p><strong>Click to upload</strong> or drag & drop an audio file</p>
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Supported formats: MP3, WAV, OGG</p>
+            <input type="file" id="fileInput" accept="audio/*">
+        </div>
+
+        <div class="controls" id="controls">
+            <div class="filename" id="filename"></div>
+
+            <div class="waveform" id="waveform">
+                <canvas class="waveform-canvas" id="waveformCanvas"></canvas>
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="playhead" id="playhead"></div>
+                <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+            </div>
+
+            <div class="control-grid">
+
+                <div class="control-group">
+                    <label>
+                        Playback Speed
+                        <span class="value-display" id="speedValue">1.0x</span>
+                    </label>
+                    <input type="range" id="speedSlider" min="0.25" max="2.0" step="0.05" value="1.0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Pitch Shift (Semitones)
+                        <span class="value-display" id="pitchValue">0</span>
+                    </label>
+                    <input type="range" id="pitchSlider" min="-12" max="12" step="1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Volume
+                        <span class="value-display" id="volumeValue">100%</span>
+                    </label>
+                    <input type="range" id="volumeSlider" min="0" max="200" step="1" value="100">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Pan (Left/Right)
+                        <span class="value-display" id="panValue">Center</span>
+                    </label>
+                    <input type="range" id="panSlider" min="-100" max="100" step="1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Bass Boost
+                        <span class="value-display" id="bassValue">0 dB</span>
+                    </label>
+                    <input type="range" id="bassSlider" min="-20" max="20" step="1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Treble
+                        <span class="value-display" id="trebleValue">0 dB</span>
+                    </label>
+                    <input type="range" id="trebleSlider" min="-20" max="20" step="1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Reverb Mix
+                        <span class="value-display" id="reverbValue">0%</span>
+                    </label>
+                    <input type="range" id="reverbSlider" min="0" max="100" step="1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Echo Delay
+                        <span class="value-display" id="echoValue">0ms</span>
+                    </label>
+                    <input type="range" id="echoSlider" min="0" max="1000" step="10" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Distortion
+                        <span class="value-display" id="distortionValue">0</span>
+                    </label>
+                    <input type="range" id="distortionSlider" min="0" max="100" step="1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Fade In Duration
+                        <span class="value-display" id="fadeInValue">0s</span>
+                    </label>
+                    <input type="range" id="fadeInSlider" min="0" max="10" step="0.1" value="0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Fade Out Duration
+                        <span class="value-display" id="fadeOutValue">0s</span>
+                    </label>
+                    <input type="range" id="fadeOutSlider" min="0" max="10" step="0.1" value="0">
+                </div>
+            </div>
+
+            <div class="button-group action-button-group">
+                <button class="play-btn" id="playBtn">▶ PLAY</button>
+                <button class="reset-btn" id="resetBtn">RESET ALL</button>
+                <button class="download-btn" id="downloadBtn">⬇ DOWNLOAD WAV</button>
+            </div>
+
+            <div class="button-group">
+                <button class="reset-btn" id="loopBtn">🔁 LOOP OFF</button>
+                <button class="reset-btn" id="reverseBtn">⏪ REVERSE</button>
+                <button class="reset-btn" id="skipBackBtn">⏮ -5S</button>
+                <button class="reset-btn" id="skipForwardBtn">⏭ +5S</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const controls = document.getElementById('controls');
+        const filename = document.getElementById('filename');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const progressBar = document.getElementById('progressBar');
+
+        const speedSlider = document.getElementById('speedSlider');
+        const pitchSlider = document.getElementById('pitchSlider');
+        const reverbSlider = document.getElementById('reverbSlider');
+
+        const speedValue = document.getElementById('speedValue');
+        const pitchValue = document.getElementById('pitchValue');
+        const reverbValue = document.getElementById('reverbValue');
+        const volumeValue = document.getElementById('volumeValue');
+        const bassValue = document.getElementById('bassValue');
+        const trebleValue = document.getElementById('trebleValue');
+        const echoValue = document.getElementById('echoValue');
+        const distortionValue = document.getElementById('distortionValue');
+        const panValue = document.getElementById('panValue');
+        const fadeInValue = document.getElementById('fadeInValue');
+        const fadeOutValue = document.getElementById('fadeOutValue');
+
+        const volumeSlider = document.getElementById('volumeSlider');
+        const bassSlider = document.getElementById('bassSlider');
+        const trebleSlider = document.getElementById('trebleSlider');
+        const echoSlider = document.getElementById('echoSlider');
+        const distortionSlider = document.getElementById('distortionSlider');
+        const panSlider = document.getElementById('panSlider');
+        const fadeInSlider = document.getElementById('fadeInSlider');
+        const fadeOutSlider = document.getElementById('fadeOutSlider');
+
+        const loopBtn = document.getElementById('loopBtn');
+        const reverseBtn = document.getElementById('reverseBtn');
+        const skipBackBtn = document.getElementById('skipBackBtn');
+        const skipForwardBtn = document.getElementById('skipForwardBtn');
+
+        const waveform = document.getElementById('waveform');
+        const waveformCanvas = document.getElementById('waveformCanvas');
+        const playhead = document.getElementById('playhead');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        let audioContext;
+        let audioBuffer;
+        let source;
+        let isPlaying = false;
+        let startTime = 0;
+        let pauseTime = 0;
+        let isLooping = false;
+        let isReversed = false;
+
+        // Audio nodes
+        let gainNode;
+        let convolverNode;
+        let reverbGain;
+        let dryGain;
+        let volumeNode;
+        let bassFilter;
+        let trebleFilter;
+        let delayNode;
+        let delayFeedback;
+        let distortionNode;
+        let pannerNode;
+        let analyser;
+
+        // Upload handling
+        uploadSection.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                loadAudio(file);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadAudio(file);
+            }
+        }
+
+        async function loadAudio(file) {
+            filename.textContent = file.name;
+            controls.classList.add('active');
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const arrayBuffer = await file.arrayBuffer();
+            audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            createReverb();
+            drawWaveform();
+        }
+
+        function createReverb() {
+            const sampleRate = audioContext.sampleRate;
+            const length = sampleRate * 2;
+            const impulse = audioContext.createBuffer(2, length, sampleRate);
+
+            for (let channel = 0; channel < 2; channel++) {
+                const channelData = impulse.getChannelData(channel);
+                for (let i = 0; i < length; i++) {
+                    channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                }
+            }
+
+            convolverNode = audioContext.createConvolver();
+            convolverNode.buffer = impulse;
+        }
+
+        function drawWaveform() {
+            const canvas = waveformCanvas;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            canvas.width = waveform.offsetWidth * dpr;
+            canvas.height = waveform.offsetHeight * dpr;
+            canvas.style.width = waveform.offsetWidth + 'px';
+            canvas.style.height = waveform.offsetHeight + 'px';
+            ctx.scale(dpr, dpr);
+
+            const width = waveform.offsetWidth;
+            const height = waveform.offsetHeight;
+            const data = audioBuffer.getChannelData(0);
+            const step = Math.ceil(data.length / width);
+            const amp = height / 2;
+
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i < width; i++) {
+                let min = 1.0;
+                let max = -1.0;
+
+                for (let j = 0; j < step; j++) {
+                    const datum = data[(i * step) + j];
+                    if (datum < min) min = datum;
+                    if (datum > max) max = datum;
+                }
+
+                ctx.moveTo(i, (1 + min) * amp);
+                ctx.lineTo(i, (1 + max) * amp);
+            }
+
+            ctx.stroke();
+        }
+
+        // Timeline scrubbing
+        waveform.addEventListener('click', (e) => {
+            if (!audioBuffer) return;
+
+            const rect = waveform.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percent = x / rect.width;
+            pauseTime = percent * audioBuffer.duration;
+
+            if (isPlaying) {
+                stopAudio();
+                playAudio();
+            } else {
+                updateTimeDisplay();
+                updatePlayhead();
+            }
+        });
+
+        let isDragging = false;
+        waveform.addEventListener('mousedown', (e) => {
+            if (!audioBuffer) return;
+            isDragging = true;
+            const wasPlaying = isPlaying;
+            if (wasPlaying) stopAudio();
+
+            const rect = waveform.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percent = x / rect.width;
+            pauseTime = percent * audioBuffer.duration;
+            updateTimeDisplay();
+            updatePlayhead();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !audioBuffer) return;
+
+            const rect = waveform.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            x = Math.max(0, Math.min(x, rect.width));
+            const percent = x / rect.width;
+            pauseTime = percent * audioBuffer.duration;
+            updateTimeDisplay();
+            updatePlayhead();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+            }
+        });
+
+        function updatePlayhead() {
+            if (!audioBuffer) return;
+            const percent = pauseTime / audioBuffer.duration;
+            playhead.style.left = (percent * 100) + '%';
+        }
+
+        function updateTimeDisplay() {
+            if (!audioBuffer) return;
+            const current = formatTime(pauseTime);
+            const total = formatTime(audioBuffer.duration);
+            timeDisplay.textContent = `${current} / ${total}`;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function playAudio() {
+            if (!audioBuffer) return;
+
+            if (isPlaying) {
+                stopAudio();
+                return;
+            }
+
+            let bufferToPlay = audioBuffer;
+
+            // Handle reverse
+            if (isReversed) {
+                bufferToPlay = audioContext.createBuffer(
+                    audioBuffer.numberOfChannels,
+                    audioBuffer.length,
+                    audioBuffer.sampleRate
+                );
+
+                for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+                    const originalData = audioBuffer.getChannelData(channel);
+                    const reversedData = bufferToPlay.getChannelData(channel);
+                    for (let i = 0; i < originalData.length; i++) {
+                        reversedData[i] = originalData[originalData.length - 1 - i];
+                    }
+                }
+            }
+
+            source = audioContext.createBufferSource();
+            source.buffer = bufferToPlay;
+            source.loop = isLooping;
+
+            const speed = parseFloat(speedSlider.value);
+            const pitch = parseInt(pitchSlider.value);
+            const reverbAmount = parseInt(reverbSlider.value) / 100;
+            const volume = parseInt(volumeSlider.value) / 100;
+            const bass = parseInt(bassSlider.value);
+            const treble = parseInt(trebleSlider.value);
+            const echoDelay = parseInt(echoSlider.value) / 1000;
+            const distortion = parseInt(distortionSlider.value);
+            const pan = parseInt(panSlider.value) / 100;
+            const fadeIn = parseFloat(fadeInSlider.value);
+            const fadeOut = parseFloat(fadeOutSlider.value);
+
+            source.playbackRate.value = speed * Math.pow(2, pitch / 12);
+
+            // Create audio graph
+            volumeNode = audioContext.createGain();
+            volumeNode.gain.value = volume;
+
+            // Bass filter
+            bassFilter = audioContext.createBiquadFilter();
+            bassFilter.type = 'lowshelf';
+            bassFilter.frequency.value = 200;
+            bassFilter.gain.value = bass;
+
+            // Treble filter
+            trebleFilter = audioContext.createBiquadFilter();
+            trebleFilter.type = 'highshelf';
+            trebleFilter.frequency.value = 3000;
+            trebleFilter.gain.value = treble;
+
+            // Echo/Delay
+            delayNode = audioContext.createDelay();
+            delayNode.delayTime.value = echoDelay;
+            delayFeedback = audioContext.createGain();
+            delayFeedback.gain.value = echoDelay > 0 ? 0.5 : 0;
+
+            // Distortion
+            distortionNode = audioContext.createWaveShaper();
+            if (distortion > 0) {
+                const k = distortion * 2;
+                const samples = 44100;
+                const curve = new Float32Array(samples);
+                const deg = Math.PI / 180;
+                for (let i = 0; i < samples; i++) {
+                    const x = (i * 2) / samples - 1;
+                    curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+                }
+                distortionNode.curve = curve;
+                distortionNode.oversample = '4x';
+            }
+
+            // Panner
+            pannerNode = audioContext.createStereoPanner();
+            pannerNode.pan.value = pan;
+
+            // Reverb setup
+            dryGain = audioContext.createGain();
+            reverbGain = audioContext.createGain();
+            gainNode = audioContext.createGain();
+
+            dryGain.gain.value = 1 - reverbAmount * 0.7;
+            reverbGain.gain.value = reverbAmount;
+
+            // Fade in
+            if (fadeIn > 0) {
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + fadeIn);
+            }
+
+            // Fade out
+            if (fadeOut > 0 && !isLooping) {
+                const fadeStartTime = audioContext.currentTime + (audioBuffer.duration - pauseTime) - fadeOut;
+                if (fadeStartTime > audioContext.currentTime) {
+                    gainNode.gain.setValueAtTime(1, fadeStartTime);
+                    gainNode.gain.linearRampToValueAtTime(0, fadeStartTime + fadeOut);
+                }
+            }
+
+            // Connect everything
+            source.connect(volumeNode);
+            volumeNode.connect(bassFilter);
+            bassFilter.connect(trebleFilter);
+            trebleFilter.connect(distortionNode);
+            distortionNode.connect(pannerNode);
+
+            // Delay feedback loop
+            pannerNode.connect(delayNode);
+            delayNode.connect(delayFeedback);
+            delayFeedback.connect(delayNode);
+
+            pannerNode.connect(dryGain);
+            delayNode.connect(dryGain);
+
+            pannerNode.connect(convolverNode);
+            convolverNode.connect(reverbGain);
+
+            dryGain.connect(gainNode);
+            reverbGain.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            source.start(0, pauseTime);
+            startTime = audioContext.currentTime - pauseTime;
+            isPlaying = true;
+            playBtn.textContent = '⏸ Pause';
+
+            updateProgress();
+
+            source.onended = () => {
+                if (isPlaying && !isLooping) {
+                    stopAudio();
+                    pauseTime = 0;
+                    progressBar.style.width = '0%';
+                    updatePlayhead();
+                    updateTimeDisplay();
+                }
+            };
+        }
+
+        function stopAudio() {
+            if (source) {
+                source.stop();
+                source.disconnect();
+            }
+            pauseTime += audioContext.currentTime - startTime;
+            if (pauseTime >= audioBuffer.duration) {
+                pauseTime = 0;
+            }
+            isPlaying = false;
+            playBtn.textContent = '▶ Play';
+        }
+
+        function updateProgress() {
+            if (isPlaying && audioBuffer) {
+                const elapsed = audioContext.currentTime - startTime;
+                pauseTime = elapsed;
+                const progress = (elapsed / audioBuffer.duration) * 100;
+                progressBar.style.width = Math.min(progress, 100) + '%';
+                playhead.style.left = Math.min(progress, 100) + '%';
+                updateTimeDisplay();
+                requestAnimationFrame(updateProgress);
+            }
+        }
+
+        playBtn.addEventListener('click', playAudio);
+
+        resetBtn.addEventListener('click', () => {
+            speedSlider.value = 1.0;
+            pitchSlider.value = 0;
+            reverbSlider.value = 0;
+            volumeSlider.value = 100;
+            bassSlider.value = 0;
+            trebleSlider.value = 0;
+            echoSlider.value = 0;
+            distortionSlider.value = 0;
+            panSlider.value = 0;
+            fadeInSlider.value = 0;
+            fadeOutSlider.value = 0;
+            updateValues();
+            if (isPlaying) {
+                stopAudio();
+                pauseTime = 0;
+                progressBar.style.width = '0%';
+                updatePlayhead();
+                updateTimeDisplay();
+            }
+        });
+
+        speedSlider.addEventListener('input', () => {
+            speedValue.textContent = parseFloat(speedSlider.value).toFixed(2) + 'x';
+            if (isPlaying) {
+                const wasPlaying = isPlaying;
+                stopAudio();
+                if (wasPlaying) playAudio();
+            }
+        });
+
+        pitchSlider.addEventListener('input', () => {
+            const val = parseInt(pitchSlider.value);
+            pitchValue.textContent = val > 0 ? '+' + val : val;
+            if (isPlaying) {
+                const wasPlaying = isPlaying;
+                stopAudio();
+                if (wasPlaying) playAudio();
+            }
+        });
+
+        reverbSlider.addEventListener('input', () => {
+            reverbValue.textContent = reverbSlider.value + '%';
+            if (isPlaying && reverbGain && dryGain) {
+                const amount = parseInt(reverbSlider.value) / 100;
+                reverbGain.gain.value = amount;
+                dryGain.gain.value = 1 - amount * 0.7;
+            }
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            volumeValue.textContent = volumeSlider.value + '%';
+            if (isPlaying && volumeNode) {
+                volumeNode.gain.value = parseInt(volumeSlider.value) / 100;
+            }
+        });
+
+        bassSlider.addEventListener('input', () => {
+            const val = parseInt(bassSlider.value);
+            bassValue.textContent = (val > 0 ? '+' : '') + val + ' dB';
+            if (isPlaying && bassFilter) {
+                bassFilter.gain.value = val;
+            }
+        });
+
+        trebleSlider.addEventListener('input', () => {
+            const val = parseInt(trebleSlider.value);
+            trebleValue.textContent = (val > 0 ? '+' : '') + val + ' dB';
+            if (isPlaying && trebleFilter) {
+                trebleFilter.gain.value = val;
+            }
+        });
+
+        echoSlider.addEventListener('input', () => {
+            echoValue.textContent = echoSlider.value + 'ms';
+            if (isPlaying && delayNode) {
+                delayNode.delayTime.value = parseInt(echoSlider.value) / 1000;
+                delayFeedback.gain.value = parseInt(echoSlider.value) > 0 ? 0.5 : 0;
+            }
+        });
+
+        distortionSlider.addEventListener('input', () => {
+            distortionValue.textContent = distortionSlider.value;
+            if (isPlaying) {
+                const wasPlaying = isPlaying;
+                stopAudio();
+                if (wasPlaying) playAudio();
+            }
+        });
+
+        panSlider.addEventListener('input', () => {
+            const val = parseInt(panSlider.value);
+            if (val === 0) {
+                panValue.textContent = 'Center';
+            } else if (val < 0) {
+                panValue.textContent = 'L' + Math.abs(val);
+            } else {
+                panValue.textContent = 'R' + val;
+            }
+            if (isPlaying && pannerNode) {
+                pannerNode.pan.value = val / 100;
+            }
+        });
+
+        fadeInSlider.addEventListener('input', () => {
+            fadeInValue.textContent = fadeInSlider.value + 's';
+        });
+
+        fadeOutSlider.addEventListener('input', () => {
+            fadeOutValue.textContent = fadeOutSlider.value + 's';
+        });
+
+        // Loop button
+        loopBtn.addEventListener('click', () => {
+            isLooping = !isLooping;
+            loopBtn.textContent = isLooping ? '🔁 Loop On' : '🔁 Loop Off';
+            loopBtn.style.background = isLooping ? '#667eea' : '#e0e0e0';
+            loopBtn.style.color = isLooping ? 'white' : '#333';
+            if (isPlaying && source) {
+                source.loop = isLooping;
+            }
+        });
+
+        // Reverse button
+        reverseBtn.addEventListener('click', () => {
+            isReversed = !isReversed;
+            reverseBtn.textContent = isReversed ? '⏪ Reversed' : '⏪ Reverse';
+            reverseBtn.style.background = isReversed ? '#667eea' : '#e0e0e0';
+            reverseBtn.style.color = isReversed ? 'white' : '#333';
+            if (isPlaying) {
+                const wasPlaying = isPlaying;
+                stopAudio();
+                if (wasPlaying) playAudio();
+            }
+        });
+
+        // Skip buttons
+        skipBackBtn.addEventListener('click', () => {
+            if (!audioBuffer) return;
+            pauseTime = Math.max(0, pauseTime - 5);
+            if (isPlaying) {
+                stopAudio();
+                playAudio();
+            } else {
+                updateTimeDisplay();
+                updatePlayhead();
+            }
+        });
+
+        skipForwardBtn.addEventListener('click', () => {
+            if (!audioBuffer) return;
+            pauseTime = Math.min(audioBuffer.duration, pauseTime + 5);
+            if (isPlaying) {
+                stopAudio();
+                playAudio();
+            } else {
+                updateTimeDisplay();
+                updatePlayhead();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (!audioBuffer) return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                playAudio();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                skipBackBtn.click();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                skipForwardBtn.click();
+            } else if (e.code === 'KeyR') {
+                resetBtn.click();
+            } else if (e.code === 'KeyL') {
+                loopBtn.click();
+            }
+        });
+
+        function updateValues() {
+            speedValue.textContent = parseFloat(speedSlider.value).toFixed(2) + 'x';
+            const val = parseInt(pitchSlider.value);
+            pitchValue.textContent = val > 0 ? '+' + val : val;
+            reverbValue.textContent = reverbSlider.value + '%';
+            volumeValue.textContent = volumeSlider.value + '%';
+            const bassVal = parseInt(bassSlider.value);
+            bassValue.textContent = (bassVal > 0 ? '+' : '') + bassVal + ' dB';
+            const trebleVal = parseInt(trebleSlider.value);
+            trebleValue.textContent = (trebleVal > 0 ? '+' : '') + trebleVal + ' dB';
+            echoValue.textContent = echoSlider.value + 'ms';
+            distortionValue.textContent = distortionSlider.value;
+            const panVal = parseInt(panSlider.value);
+            if (panVal === 0) {
+                panValue.textContent = 'Center';
+            } else if (panVal < 0) {
+                panValue.textContent = 'L' + Math.abs(panVal);
+            } else {
+                panValue.textContent = 'R' + panVal;
+            }
+            fadeInValue.textContent = fadeInSlider.value + 's';
+            fadeOutValue.textContent = fadeOutSlider.value + 's';
+        }
+
+        downloadBtn.addEventListener('click', async () => {
+            if (!audioBuffer) return;
+
+            downloadBtn.textContent = '⏳ Processing...';
+            downloadBtn.disabled = true;
+
+            try {
+                let bufferToRender = audioBuffer;
+
+                if (isReversed) {
+                    bufferToRender = audioContext.createBuffer(
+                        audioBuffer.numberOfChannels,
+                        audioBuffer.length,
+                        audioBuffer.sampleRate
+                    );
+
+                    for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+                        const originalData = audioBuffer.getChannelData(channel);
+                        const reversedData = bufferToRender.getChannelData(channel);
+                        for (let i = 0; i < originalData.length; i++) {
+                            reversedData[i] = originalData[originalData.length - 1 - i];
+                        }
+                    }
+                }
+
+                const speed = parseFloat(speedSlider.value);
+                const pitch = parseInt(pitchSlider.value);
+                const reverbAmount = parseInt(reverbSlider.value) / 100;
+                const volume = parseInt(volumeSlider.value) / 100;
+                const bass = parseInt(bassSlider.value);
+                const treble = parseInt(trebleSlider.value);
+                const echoDelay = parseInt(echoSlider.value) / 1000;
+                const distortion = parseInt(distortionSlider.value);
+                const pan = parseInt(panSlider.value) / 100;
+
+                const offlineContext = new OfflineAudioContext(
+                    bufferToRender.numberOfChannels,
+                    bufferToRender.length / (speed * Math.pow(2, pitch / 12)),
+                    bufferToRender.sampleRate
+                );
+
+                const offlineSource = offlineContext.createBufferSource();
+                offlineSource.buffer = bufferToRender;
+                offlineSource.playbackRate.value = speed * Math.pow(2, pitch / 12);
+
+                const offlineVolumeNode = offlineContext.createGain();
+                offlineVolumeNode.gain.value = volume;
+
+                const offlineBassFilter = offlineContext.createBiquadFilter();
+                offlineBassFilter.type = 'lowshelf';
+                offlineBassFilter.frequency.value = 200;
+                offlineBassFilter.gain.value = bass;
+
+                const offlineTrebleFilter = offlineContext.createBiquadFilter();
+                offlineTrebleFilter.type = 'highshelf';
+                offlineTrebleFilter.frequency.value = 3000;
+                offlineTrebleFilter.gain.value = treble;
+
+                const offlineDelayNode = offlineContext.createDelay();
+                offlineDelayNode.delayTime.value = echoDelay;
+                const offlineDelayFeedback = offlineContext.createGain();
+                offlineDelayFeedback.gain.value = echoDelay > 0 ? 0.5 : 0;
+
+                const offlineDistortionNode = offlineContext.createWaveShaper();
+                if (distortion > 0) {
+                    const k = distortion * 2;
+                    const samples = 44100;
+                    const curve = new Float32Array(samples);
+                    const deg = Math.PI / 180;
+                    for (let i = 0; i < samples; i++) {
+                        const x = (i * 2) / samples - 1;
+                        curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+                    }
+                    offlineDistortionNode.curve = curve;
+                }
+
+                const offlinePannerNode = offlineContext.createStereoPanner();
+                offlinePannerNode.pan.value = pan;
+
+                const offlineDryGain = offlineContext.createGain();
+                const offlineReverbGain = offlineContext.createGain();
+                const offlineConvolver = offlineContext.createConvolver();
+                offlineConvolver.buffer = convolverNode.buffer;
+
+                offlineDryGain.gain.value = 1 - reverbAmount * 0.7;
+                offlineReverbGain.gain.value = reverbAmount;
+
+                offlineSource.connect(offlineVolumeNode);
+                offlineVolumeNode.connect(offlineBassFilter);
+                offlineBassFilter.connect(offlineTrebleFilter);
+                offlineTrebleFilter.connect(offlineDistortionNode);
+                offlineDistortionNode.connect(offlinePannerNode);
+
+                offlinePannerNode.connect(offlineDelayNode);
+                offlineDelayNode.connect(offlineDelayFeedback);
+                offlineDelayFeedback.connect(offlineDelayNode);
+
+                offlinePannerNode.connect(offlineDryGain);
+                offlineDelayNode.connect(offlineDryGain);
+
+                offlinePannerNode.connect(offlineConvolver);
+                offlineConvolver.connect(offlineReverbGain);
+
+                offlineDryGain.connect(offlineContext.destination);
+                offlineReverbGain.connect(offlineContext.destination);
+
+                offlineSource.start();
+
+                const renderedBuffer = await offlineContext.startRendering();
+                const wav = audioBufferToWav(renderedBuffer);
+                const blob = new Blob([wav], { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'edited-audio.wav';
+                a.click();
+
+                downloadBtn.textContent = '⬇ Download';
+                downloadBtn.disabled = false;
+            } catch (error) {
+                console.error('Download error:', error);
+                downloadBtn.textContent = '⬇ Download';
+                downloadBtn.disabled = false;
+                alert('Error processing audio. Please try again.');
+            }
+        });
+
+        function audioBufferToWav(buffer) {
+            const length = buffer.length * buffer.numberOfChannels * 2 + 44;
+            const arrayBuffer = new ArrayBuffer(length);
+            const view = new DataView(arrayBuffer);
+            const channels = [];
+            let offset = 0;
+            let pos = 0;
+
+            function setUint16(data) {
+                view.setUint16(pos, data, true);
+                pos += 2;
+            }
+
+            function setUint32(data) {
+                view.setUint32(pos, data, true);
+                pos += 4;
+            }
+
+            setUint32(0x46464952);
+            setUint32(length - 8);
+            setUint32(0x45564157);
+            setUint32(0x20746d66);
+            setUint32(16);
+            setUint16(1);
+            setUint16(buffer.numberOfChannels);
+            setUint32(buffer.sampleRate);
+            setUint32(buffer.sampleRate * 2 * buffer.numberOfChannels);
+            setUint16(buffer.numberOfChannels * 2);
+            setUint16(16);
+            setUint32(0x61746164);
+            setUint32(length - pos - 4);
+
+            for (let i = 0; i < buffer.numberOfChannels; i++) {
+                channels.push(buffer.getChannelData(i));
+            }
+
+            while (pos < length) {
+                for (let i = 0; i < buffer.numberOfChannels; i++) {
+                    let sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                    sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                    view.setInt16(pos, sample, true);
+                    pos += 2;
+                }
+                offset++;
+            }
+
+            return arrayBuffer;
+        }
+    </script>
+</body>
+
+</html>
