@@ -329,6 +329,29 @@
             /* Full width for the main buttons */
             margin-top: 15px;
         }
+        
+        .footer-info {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #374151;
+        }
+        
+        .footer-info p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        .footer-info a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-info a:hover {
+            color: #3b82f6;
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 650px) {
@@ -463,6 +486,10 @@
                 <button class="reset-btn" id="reverseBtn">⏪ REVERSE</button>
                 <button class="reset-btn" id="skipBackBtn">⏮ -5S</button>
                 <button class="reset-btn" id="skipForwardBtn">⏭ +5S</button>
+            </div>
+            
+            <div class="footer-info">
+                <p>For bugs or feature suggestions, please email: <a href="mailto:ajontheinternet100@gmail.com?subject=Audio%20Lab%20Feedback">ajontheinternet100@gmail.com</a></p>
             </div>
         </div>
     </div>
@@ -995,8 +1022,8 @@
         loopBtn.addEventListener('click', () => {
             isLooping = !isLooping;
             loopBtn.textContent = isLooping ? '🔁 Loop On' : '🔁 Loop Off';
-            loopBtn.style.background = isLooping ? '#667eea' : '#e0e0e0';
-            loopBtn.style.color = isLooping ? 'white' : '#333';
+            loopBtn.style.background = isLooping ? '#667eea' : '#4b5563';
+            loopBtn.style.color = 'white';
             if (isPlaying && source) {
                 source.loop = isLooping;
             }
@@ -1006,8 +1033,8 @@
         reverseBtn.addEventListener('click', () => {
             isReversed = !isReversed;
             reverseBtn.textContent = isReversed ? '⏪ Reversed' : '⏪ Reverse';
-            reverseBtn.style.background = isReversed ? '#667eea' : '#e0e0e0';
-            reverseBtn.style.color = isReversed ? 'white' : '#333';
+            reverseBtn.style.background = isReversed ? '#667eea' : '#4b5563';
+            reverseBtn.style.color = 'white';
             if (isPlaying) {
                 const wasPlaying = isPlaying;
                 stopAudio();
@@ -1082,6 +1109,14 @@
             }
             fadeInValue.textContent = fadeInSlider.value + 's';
             fadeOutValue.textContent = fadeOutSlider.value + 's';
+            
+            // Update loop/reverse button appearance on reset
+            isLooping = false;
+            loopBtn.textContent = '🔁 LOOP OFF';
+            loopBtn.style.background = '#4b5563';
+            isReversed = false;
+            reverseBtn.textContent = '⏪ REVERSE';
+            reverseBtn.style.background = '#4b5563';
         }
 
         downloadBtn.addEventListener('click', async () => {
@@ -1202,11 +1237,11 @@
                 a.download = 'edited-audio.wav';
                 a.click();
 
-                downloadBtn.textContent = '⬇ Download';
+                downloadBtn.textContent = '⬇ DOWNLOAD WAV';
                 downloadBtn.disabled = false;
             } catch (error) {
                 console.error('Download error:', error);
-                downloadBtn.textContent = '⬇ Download';
+                downloadBtn.textContent = '⬇ DOWNLOAD WAV';
                 downloadBtn.disabled = false;
                 alert('Error processing audio. Please try again.');
             }
